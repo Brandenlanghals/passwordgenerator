@@ -1,86 +1,95 @@
 
-//variables
-const resultEl = document.getElementById('result');
-const lengthEl = document.getElementById('length');
-const uppercaseEl = document.getElementById('uppercase');
-const lowercaseEl = document.getElementById('lowercase');
-const numbersEl = document.getElementById('numbers');
-const symbolsEl = document.getElementById('symbols');
-const generateEl = document.getElementById('generate');
-const clipboard = document.getElementById('clipboard');
+// Create strings to pull from
+var lowerCharacters = "abcdefghijklmnopqrstuvwxyz";
+var upperCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+var numericCharacters = "0123456789";
+var specialCharacters = "!#$%&'()*+,-./:;<=>?@[]^_`{}~";
 
-const randomFunc = {
-	lower: getRandomLower,
-	upper: getRandomUpper,
-	number: getRandomNumber,
-	symbol: getRandomSymbol
-}
-//clipboard copy event listener
-clipboard.addEventListener('click', () => {
-	const textarea = document.createElement('textarea');
-	const password = resultEl.innerText;
-	
-	if(!password) { return; }
-	
-	textarea.value = password;
-	document.body.appendChild(textarea);
-	textarea.select();
-	document.execCommand('copy');
-	textarea.remove();
-	alert('Password copied to clipboard');
-});
-//generate button event listener
-generate.addEventListener('click', () => {
-	const length = +lengthEl.value;
-	const hasLower = lowercaseEl.checked;
-	const hasUpper = uppercaseEl.checked;
-	const hasNumber = numbersEl.checked;
-	const hasSymbol = symbolsEl.checked;
-	
-	resultEl.innerText = generatePassword(hasLower, hasUpper, hasNumber, hasSymbol, length);
-});
+// Combined strings 
+var combinedCharacters = [];
 
-function generatePassword(lower, upper, number, symbol, length) {
-	let generatedPassword = '';
-	const typesCount = lower + upper + number + symbol;
-	const typesArr = [{lower}, {upper}, {number}, {symbol}].filter(item => Object.values(item)[0]);
-	
-	// Doesn't have a selected type
-	if(typesCount === 0) {
-		return '';
-	}
-	
-	// for loop
-	for(let i=0; i<length; i+=typesCount) {
-		typesArr.forEach(type => {
-			const funcName = Object.keys(type)[0];
-			generatedPassword += randomFunc[funcName]();
-		});
-	}
-	
-	const finalPassword = generatedPassword.slice(0, length);
-	
-	return finalPassword;
-}
-//Functions for each selected criteria
-function getRandomLower() {
-	return String.fromCharCode(Math.floor(Math.random() * 26) + 97);
-}
 
-function getRandomUpper() {
-	return String.fromCharCode(Math.floor(Math.random() * 26) + 65);
+// Create user-slected criteria
+var userInput = parseInt(prompt(
+    "How many characters would you like your password to contain?"
+    ));
+
+
+// confirm boxes
+var lowercase = confirm('Click OK to confirm using lowercase characters');
+var uppercase = confirm('Click OK to confirm using uppercase characters');
+var numbers = confirm('Click OK to confirm using numbers');
+var special = confirm('Click OK to confirm using special characters');
+
+
+function userLength(){
+
+    // Conditional statement to check if password length is a number. 
+    if (isNaN(userInput) === true) {
+        alert("Password length must be provided as a number");
+        return;
+    }
+
+    // Conditional statement to check if password length is at least 8 characters long.
+    if (userInput < 8) {
+        alert("Password length must be at least 8 characters");
+        return;
+    }
+
+    // Conditional statement to check if password length is less than 128 characters long.
+    if (userInput > 128) {
+        alert("Password length must less than 129 characters");
+        return;
+    }
+
+    if (lowercase){
+        combinedCharacters += lowerCharacters;
+    }
+    if (uppercase){
+        combinedCharacters += upperCharacters;
+    }
+    if (numbers){
+        combinedCharacters += numericCharacters;
+    }
+    if (special){
+        combinedCharacters += specialCharacters;
+    }
+
+      // Conditional statement to check if user does not include any types of characters
+    if (
+        lowerCharacters === false &&
+        upperCharacters === false &&
+        numericCharacters === false &&
+        specialCharacters === false 
+    ) {
+        alert("Must select at least one character type");
+        return;
+    }
+
 }
 
-function getRandomNumber() {
-	return +String.fromCharCode(Math.floor(Math.random() * 10) + 48);
+// Generate random letters from array
+function randomLetter (arr) {
+    let letter = arr[Math.floor(Math.random() * arr.length)];
+    return letter;
 }
 
-function getRandomSymbol() {
-	const symbols = '!@#$%^&*(){}[]=<>/,.'
-	return symbols[Math.floor(Math.random() * symbols.length)];
+// Loop through the array 
+function generate (arr) {
+    userLength();
+    var password = " ";
+    for(var i = 0; i < userInput; i++) {
+        password += randomLetter(arr);
+    }
+    return password;
 }
 
+// Text area ID 
+var box = document.getElementById('passTextBox');
 
-
-
+// When generate button is clicked send password into text field
+generateBtn.onclick = function(){
+    var pass = generate(combinedCharacters);
+    box.textContent = pass;
+}
 
